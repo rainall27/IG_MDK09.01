@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация — Конференции.РФ{% endblock %}
+{% block content %}
+<section class="auth card">
+    <h1>Регистрация</h1>
+    <form class="form" id="register-form" novalidate>
+        <div class="form-alert" data-form-alert hidden></div>
+
+        <div class="field">
+            <label for="login">Логин</label>
+            <input id="login" name="login" autocomplete="username" maxlength="50" required>
+            <small class="hint">Латиница и цифры, не менее 6 символов</small>
+            <div class="field__error" data-error-for="login"></div>
+        </div>
+        <div class="field">
+            <label for="password">Пароль</label>
+            <div class="pwd">
+                <input id="password" name="password" type="password" autocomplete="new-password" maxlength="128" required>
+                <button class="pwd__toggle" type="button" data-toggle-pwd="password" aria-label="Показать пароль">👁</button>
+            </div>
+            <small class="hint">Минимум 8 символов</small>
+            <div class="field__error" data-error-for="password"></div>
+        </div>
+        <div class="field">
+            <label for="fio">ФИО</label>
+            <input id="fio" name="fio" autocomplete="name" maxlength="150" required>
+            <div class="field__error" data-error-for="fio"></div>
+        </div>
+        <div class="field">
+            <label for="phone">Телефон</label>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" placeholder="8(XXX)XXX-XX-XX" autocomplete="tel" maxlength="15" required>
+            <div class="field__error" data-error-for="phone"></div>
+        </div>
+        <div class="field">
+            <label for="email">Электронная почта</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="100" required>
+            <div class="field__error" data-error-for="email"></div>
+        </div>
+
+        <button class="btn btn--primary btn--block" type="submit">Зарегистрироваться</button>
+        <p class="form-switch">Уже зарегистрированы? <a href="{{ url_for('auth.login_page') }}">Авторизация</a></p>
+    </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ asset('js/validation.js') }}" defer></script>
+<script src="{{ asset('js/register.js') }}" defer></script>{% endblock %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+    <picture>
+        <source srcset="{{ url_for('static', filename='img/hero.webp') }}" type="image/webp">
+        <img src="{{ url_for('static', filename='img/hero.jpg') }}" alt="" width="1200" height="600" fetchpriority="high">
+    </picture>
+    <div class="hero__body">
+        <h1>Помещения для Всероссийских конференций</h1>
+        <p>Выберите аудиторию, коворкинг или кинозал, укажите дату начала и способ оплаты — администратор рассмотрит заявку.</p>
+        <div class="hero__actions">
+            {% if current_user and current_user.role == 'user' %}
+                <a class="btn btn--primary" href="{{ url_for('requests.create_page') }}">Забронировать</a>
+                <a class="btn btn--outline" href="{{ url_for('requests.dashboard') }}">Мои заявки</a>
+            {% elif current_user %}
+                <a class="btn btn--primary" href="{{ url_for('admin.admin_page') }}">Панель администратора</a>
+            {% else %}
+                <a class="btn btn--primary" href="{{ url_for('auth.register_page') }}">Зарегистрироваться</a>
+                <a class="btn btn--outline" href="{{ url_for('auth.login_page') }}">Войти</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<h2>Наши помещения</h2>
+<div class="grid grid--3">
+    {% for room in rooms %}
+    <article class="card card--hover room" data-testid="room-card">
+        <picture>
+            <source srcset="{{ url_for('static', filename=room.image) }}" type="image/webp">
+            <img class="room__img" src="{{ url_for('static', filename=room.image|replace('.webp', '.jpg')) }}" alt="{{ room.name }}" width="640" height="400" loading="lazy">
+        </picture>
+        <div class="room__body">
+            <div class="room__meta">
+                <h3>{{ room.name }}</h3>
+                <span class="hint">до {{ room.capacity }} чел.</span>
+            </div>
+            <p>{{ room.description }}</p>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}

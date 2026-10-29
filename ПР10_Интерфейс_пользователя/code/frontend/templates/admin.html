@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Панель администратора — Конференции.РФ{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>Панель администратора</h1>
+    <span class="hint">Все заявки зарегистрированных пользователей</span>
+</div>
+
+<div class="stats" data-stats>
+    <div class="stat"><b data-stat="1">{{ stats[1] }}</b><span>Новые</span></div>
+    <div class="stat"><b data-stat="2">{{ stats[2] }}</b><span>Назначены</span></div>
+    <div class="stat"><b data-stat="3">{{ stats[3] }}</b><span>Завершены</span></div>
+</div>
+
+<form class="filters" id="filters" novalidate>
+    <select name="status" aria-label="Статус">
+        <option value="">Все статусы</option>
+        {% for s in statuses %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+    </select>
+    <select name="room" aria-label="Помещение">
+        <option value="">Все помещения</option>
+        {% for r in rooms %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}
+    </select>
+    <input class="filters__search" name="q" type="search" placeholder="Поиск по логину или ФИО" aria-label="Поиск">
+    <input name="from" type="date" aria-label="Начало с">
+    <input name="to" type="date" aria-label="Начало по">
+    <button class="btn btn--outline btn--sm" type="reset">Сбросить</button>
+</form>
+
+<div class="grid grid--3" data-admin-list data-statuses='{{ statuses|map(attribute="__dict__")|list|tojson }}'></div>
+<div class="card empty" data-admin-empty hidden>Заявок по выбранным условиям нет.</div>
+{% endblock %}
+{% block scripts %}<script src="{{ asset('js/admin.js') }}" defer></script>{% endblock %}

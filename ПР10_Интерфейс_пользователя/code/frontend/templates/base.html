@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="Конференции.РФ — бронирование помещений для проведения Всероссийских конференций">
+    <title>{% block title %}Конференции.РФ{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-32.png') }}">
+    <link rel="preload" href="{{ url_for('static', filename='fonts/PTSans-Regular.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+</head>
+<body>
+<header class="header">
+    <div class="container header__inner">
+        <a class="logo" href="{{ url_for('main.index') }}">
+            <img src="{{ url_for('static', filename='img/logo-64.png') }}" width="36" height="36" alt="">
+            <span>Конференции<b>.РФ</b></span>
+        </a>
+        <button class="burger" type="button" aria-label="Меню" aria-expanded="false" data-burger><span></span></button>
+        <nav class="nav" data-nav>
+            {% set ep = request.endpoint %}
+            <a href="{{ url_for('main.index') }}" class="{{ 'active' if ep == 'main.index' }}">Помещения</a>
+            {% if current_user %}
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.admin_page') }}" class="{{ 'active' if ep == 'admin.admin_page' }}">Панель администратора</a>
+                {% else %}
+                    <a href="{{ url_for('requests.profile') }}" class="{{ 'active' if ep == 'requests.profile' }}">Личный кабинет</a>
+                    <a href="{{ url_for('requests.dashboard') }}" class="{{ 'active' if ep == 'requests.dashboard' }}">Мои заявки</a>
+                    <a href="{{ url_for('requests.create_page') }}" class="{{ 'active' if ep == 'requests.create_page' }}">Новая заявка</a>
+                {% endif %}
+                <span class="nav__user">{{ current_user.login }}</span>
+                <form action="{{ url_for('auth.logout') }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="link-btn" type="submit" data-testid="logout">Выйти</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('auth.login_page') }}" class="{{ 'active' if ep == 'auth.login_page' }}">Вход</a>
+                <a href="{{ url_for('auth.register_page') }}" class="{{ 'active' if ep == 'auth.register_page' }}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container page" data-page>
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container footer__inner">
+        <span>© 2027 Конференции.РФ — бронирование помещений для Всероссийских конференций</span>
+        <div class="social">
+            <a href="#" aria-label="ВКонтакте"><img src="{{ url_for('static', filename='img/social-vk.png') }}" width="32" height="32" alt="ВКонтакте" loading="lazy"></a>
+            <a href="#" aria-label="Одноклассники"><img src="{{ url_for('static', filename='img/social-ok.png') }}" width="32" height="32" alt="Одноклассники" loading="lazy"></a>
+        </div>
+    </div>
+</footer>
+
+<div class="toasts" data-toasts aria-live="polite"></div>
+<script src="{{ asset('js/common.js') }}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
