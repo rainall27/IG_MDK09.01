@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Личный кабинет — Конференции.РФ{% endblock %}
+{% block content %}
+<div class="page-head">
+    <h1>Личный кабинет</h1>
+    <div class="actions">
+        <a class="btn btn--outline" href="{{ url_for('requests.dashboard') }}">Мои заявки</a>
+        <a class="btn btn--primary" href="{{ url_for('requests.create_page') }}">+ Новая заявка</a>
+    </div>
+</div>
+
+<div class="profile">
+    <section class="card" data-testid="profile-card">
+        <div class="profile__head">
+            <div class="avatar" aria-hidden="true">{{ user.fio[:1] }}</div>
+            <div>
+                <h2 class="profile__name">{{ user.fio }}</h2>
+                <span class="hint">Участник с {{ user.created_at[:10] }}</span>
+            </div>
+        </div>
+        <dl class="req__list">
+            <dt>Логин</dt><dd>{{ user.login }}</dd>
+            <dt>Телефон</dt><dd>{{ user.phone }}</dd>
+            <dt>Email</dt><dd>{{ user.email }}</dd>
+        </dl>
+    </section>
+
+    <section class="card">
+        <h3>Ближайшее мероприятие</h3>
+        {% if summary.next_event %}
+            <div class="next-event"><b>{{ summary.next_event }}</b><span>— мероприятие назначено</span></div>
+        {% else %}
+            <p class="hint">Назначенных мероприятий пока нет.</p>
+        {% endif %}
+        <h3>Отзывы</h3>
+        <p>Оставлено отзывов: <b>{{ summary.reviews }}</b> из {{ summary.done }} завершённых мероприятий.</p>
+    </section>
+
+    <section class="profile__stats">
+        <div class="stats">
+            <div class="stat"><b>{{ summary.total }}</b><span>Всего заявок</span></div>
+            <div class="stat"><b>{{ summary.new }}</b><span>Новые</span></div>
+            <div class="stat"><b>{{ summary.assigned }}</b><span>Назначены</span></div>
+            <div class="stat"><b>{{ summary.done }}</b><span>Завершены</span></div>
+        </div>
+    </section>
+</div>
+{% endblock %}

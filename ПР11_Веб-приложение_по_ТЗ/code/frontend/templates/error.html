@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Ошибка {{ code }} — Конференции.РФ{% endblock %}
+{% block content %}
+<section class="error-page">
+    <b>{{ code }}</b>
+    <h1>{{ text }}</h1>
+    <a class="btn btn--primary" href="{{ url_for('main.index') }}">На главную</a>
+</section>
+{% endblock %}
