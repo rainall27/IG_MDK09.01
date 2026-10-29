@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Авторизация — Конференции.РФ{% endblock %}
+{% block content %}
+<section class="auth card">
+    <h1>Авторизация</h1>
+    <form class="form" id="login-form" novalidate>
+        <div class="form-alert" data-form-alert hidden></div>
+        <div class="field">
+            <label for="login">Логин</label>
+            <input id="login" name="login" autocomplete="username" maxlength="50" required>
+            <div class="field__error" data-error-for="login"></div>
+        </div>
+        <div class="field">
+            <label for="password">Пароль</label>
+            <div class="pwd">
+                <input id="password" name="password" type="password" autocomplete="current-password" maxlength="128" required>
+                <button class="pwd__toggle" type="button" data-toggle-pwd="password" aria-label="Показать пароль">👁</button>
+            </div>
+            <div class="field__error" data-error-for="password"></div>
+        </div>
+        <button class="btn btn--primary btn--block" type="submit">Войти</button>
+        <p class="form-switch">Еще не зарегистрированы? <a href="{{ url_for('auth.register_page') }}">Регистрация</a></p>
+    </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ asset('js/login.js') }}" defer></script>{% endblock %}

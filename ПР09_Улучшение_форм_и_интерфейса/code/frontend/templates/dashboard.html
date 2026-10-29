@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Мои заявки — Конференции.РФ{% endblock %}
+{% block content %}
+<div class="page-head">
+    <div>
+        <h1>Мои заявки</h1>
+        <span class="hint">{{ current_user.fio }}</span>
+    </div>
+    <a class="btn btn--primary" href="{{ url_for('requests.create_page') }}">+ Новая заявка</a>
+</div>
+
+{% if requests %}
+<div class="grid grid--2" data-testid="my-requests">
+    {% for r in requests %}
+    <article class="card req" data-request-id="{{ r.id }}" data-testid="request-card">
+        <div class="req__head">
+            <p class="req__title">{{ r.room }}</p>
+            <span class="badge badge--{{ r.status_id }}" data-testid="status">{{ r.status }}</span>
+        </div>
+        <dl class="req__list">
+            <dt>Заявка</dt><dd>№ {{ r.id }}</dd>
+            <dt>Начало</dt><dd>{{ r.start_at|replace('T', ' ') }}</dd>
+            <dt>Оплата</dt><dd>{{ r.payment_method }}</dd>
+            <dt>Подана</dt><dd>{{ r.created_at[:16] }}</dd>
+        </dl>
+
+        {% if r.review_id %}
+            <div class="review">
+                <span class="rating-view" aria-label="Оценка {{ r.review_rating }} из 5">{{ '★' * r.review_rating }}{{ '☆' * (5 - r.review_rating) }}</span>
+                <p class="review__text">{{ r.review_text }}</p>
+            </div>
+        {% elif r.status_id == 3 %}
+            <form class="form review" data-review-form="{{ r.id }}" novalidate>
+                <strong>Оставьте отзыв о мероприятии</strong>
+                <div class="field">
+                    <div class="stars" role="radiogroup" aria-label="Оценка">
+                        {% for n in range(5, 0, -1) %}
+                        <input type="radio" id="r{{ r.id }}-{{ n }}" name="rating" value="{{ n }}">
+                        <label for="r{{ r.id }}-{{ n }}" title="{{ n }}">★</label>
+                        {% endfor %}
+                    </div>
+                    <div class="field__error" data-error-for="rating"></div>
+                </div>
+                <div class="field">
+                    <label for="text-{{ r.id }}">Отзыв</label>
+                    <textarea id="text-{{ r.id }}" name="text" maxlength="1000" placeholder="Как прошло мероприятие?"></textarea>
+                    <div class="field__error" data-error-for="text"></div>
+                </div>
+                <div class="form-alert" data-form-alert hidden></div>
+                <button class="btn btn--primary btn--sm" type="submit">Отправить отзыв</button>
+            </form>
+        {% else %}
+            <p class="hint">Отзыв можно будет оставить после завершения мероприятия.</p>
+        {% endif %}
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card empty">
+    <p>У вас пока нет заявок.</p>
+    <a class="btn btn--primary" href="{{ url_for('requests.create_page') }}">Создать первую заявку</a>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="{{ asset('js/validation.js') }}" defer></script>
+<script src="{{ asset('js/dashboard.js') }}" defer></script>{% endblock %}
