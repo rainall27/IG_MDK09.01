@@ -187,3 +187,45 @@ def test_profile_page(client):
     post(client, '/api/requests', {'room_id': 1, 'payment_method_id': 1, 'start_at': future()})
     html = client.get('/profile').get_data(as_text=True)
     assert 'Личный кабинет' in html and USER['login'] in html and USER['phone'] in html
+
+
+def test_delete_own_new_request(client):
+    register_and_login(client)
+    req_id = post(client, '/api/requests', {'room_id': 1, 'payment_method_id': 1, 'start_at': future()}).get_json()['id']
+    r = post(client, f'/api/requests/{req_id}', {}, 'delete')
+    assert r.status_code == 200
+    assert client.get('/api/requests').get_json()['requests'] == []
+    assert post(client, f'/api/requests/{req_id}', {}, 'delete').status_code == 404
+
+
+def test_cannot_delete_assigned_request(app):
+    user = app.test_client(); user.get('/')
+    with user.session_transaction() as s:
+        user.csrf = s['_csrf']
+    register_and_login(user)
+    req_id = post(user, '/api/requests', {'room_id': 1, 'payment_method_id': 1, 'start_at': future()}).get_json()['id']
+    admin = app.test_client(); admin.get('/')
+    with admin.session_transaction() as s:
+        admin.csrf = s['_csrf']
+    login_admin(admin)
+    post(admin, f'/api/admin/requests/{req_id}/status', {'status_id': 2}, 'patch')
+    assert post(user, f'/api/requests/{req_id}', {}, 'delete').status_code == 409
+    assert len(user.get('/api/requests').get_json()['requests']) == 1
+
+
+def test_cannot_delete_foreign_request(app):
+    owner = app.test_client(); owner.get('/')
+    with owner.session_transaction() as s:
+        owner.csrf = s['_csrf']
+    register_and_login(owner)
+    req_id = post(owner, '/api/requests', {'room_id': 1, 'payment_method_id': 1, 'start_at': future()}).get_json()['id']
+    other = app.test_client(); other.get('/')
+    with other.session_transaction() as s:
+        other.csrf = s['_csrf']
+    register_and_login(other, {**USER, 'login': 'student02', 'email': 'two@mail.ru'})
+    assert post(other, f'/api/requests/{req_id}', {}, 'delete').status_code == 404
+    assert len(owner.get('/api/requests').get_json()['requests']) == 1
+
+
+def test_delete_requires_csrf_and_login(client):
+    assert client.delete('/api/requests/1').status_code in (400, 401)

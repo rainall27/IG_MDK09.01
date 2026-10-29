@@ -52,6 +52,10 @@
         {% else %}
             <p class="hint">Отзыв можно будет оставить после завершения мероприятия.</p>
         {% endif %}
+
+        {% if r.status_id == 1 %}
+            <button class="btn btn--danger btn--sm" type="button" data-delete-request="{{ r.id }}">Удалить заявку</button>
+        {% endif %}
     </article>
     {% endfor %}
 </div>

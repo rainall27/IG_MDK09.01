@@ -14,7 +14,12 @@
 | **Create** | регистрация, создание заявки, отзыв | `INSERT INTO user / request / review ...` |
 | **Read** | мои заявки, все заявки с фильтрами, справочники | `SELECT ... JOIN room, payment_method, status, user LEFT JOIN review` |
 | **Update** | смена статуса заявки | `UPDATE request SET status_id = ? WHERE id = ?` |
-| **Delete** | каскадное удаление заявок и отзывов вместе с пользователем | `FOREIGN KEY ... ON DELETE CASCADE` |
+| **Delete** | участник удаляет свою заявку в статусе «Новая» (кнопка «Удалить заявку», `DELETE /api/requests/<id>`); отзывы и заявки удаляются каскадно вместе с пользователем | `DELETE FROM request WHERE id = ? AND user_id = ?`, `FOREIGN KEY ... ON DELETE CASCADE` |
+
+### Удаление заявки
+- Кнопка «Удалить заявку» показывается только у заявок в статусе «Новая». Первое нажатие просит подтверждения («Точно удалить?»), второе удаляет заявку без перезагрузки страницы. Окон браузера нет, подтверждение сбрасывается через 4 секунды.
+- Сервер (`Request.delete_own`) повторно проверяет правила: чужая заявка не найдена (404), заявка не в статусе «Новая» не удаляется (409), нужен CSRF-токен и вход участником.
+- Проверено тестами `test_delete_own_new_request`, `test_cannot_delete_assigned_request`, `test_cannot_delete_foreign_request`, `test_delete_requires_csrf_and_login`.
 
 ## 3. Смена статусов
 `Новая → Мероприятие назначено → Завершено`. Статус двигается только вперёд: в карточке админки выпадающий список предлагает только следующие статусы, и сервер (`Request.change_status`) повторно проверяет правило. Попытка вернуть статус назад получает ответ 400.
@@ -53,3 +58,8 @@ python seed_demo.py            # тестовые данные
 python run.py                  # http://127.0.0.1:5000
 ```
 Администратор: **Conf2027 / Demo77**, участник: **ivanov01 / Password1**. Тесты: `pip install pytest`, затем `python -m pytest -q tests`.
+
+## Удаление заявки
+| Подтверждение | После удаления |
+|---|---|
+| ![](img/04_delete_request_confirm.png) | ![](img/05_delete_request_done.png) |

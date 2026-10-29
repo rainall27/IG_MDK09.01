@@ -51,6 +51,15 @@ def api_create_request():
                    redirect=url_for('requests.dashboard')), 201
 
 
+@request_bp.delete('/api/requests/<int:request_id>')
+@participant_required
+def api_delete_request(request_id):
+    error, code = Request.delete_own(session['user_id'], request_id)
+    if error:
+        return jsonify(errors={'form': error}), code
+    return jsonify(message='Заявка удалена'), 200
+
+
 @request_bp.post('/api/requests/<int:request_id>/review')
 @participant_required
 def api_create_review(request_id):

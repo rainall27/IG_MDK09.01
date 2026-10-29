@@ -1,6 +1,34 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-delete-request]').forEach((btn) => {
+        let timer = null;
+        btn.addEventListener('click', async () => {
+            if (!btn.classList.contains('is-confirm')) {
+                btn.classList.add('is-confirm');
+                btn.textContent = 'Точно удалить?';
+                timer = setTimeout(() => {
+                    btn.classList.remove('is-confirm');
+                    btn.textContent = 'Удалить заявку';
+                }, 4000);
+                return;
+            }
+            clearTimeout(timer);
+            App.loading(btn, true);
+            const { ok, data } = await App.api(`/api/requests/${btn.dataset.deleteRequest}`, { method: 'DELETE' });
+            if (!ok) {
+                App.loading(btn, false);
+                App.toast(data.errors?.form || 'Не удалось удалить заявку', 'error');
+                return;
+            }
+            const card = btn.closest('[data-testid="request-card"]');
+            const grid = card.parentElement;
+            card.remove();
+            App.toast(data.message);
+            if (!grid.querySelector('[data-testid="request-card"]')) setTimeout(() => location.reload(), 600);
+        });
+    });
+
     document.querySelectorAll('[data-review-form]').forEach((form) => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

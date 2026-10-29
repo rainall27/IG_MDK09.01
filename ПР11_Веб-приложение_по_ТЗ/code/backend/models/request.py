@@ -85,6 +85,16 @@ class Request(BaseModel):
         return ''
 
     @classmethod
+    def delete_own(cls, user_id, request_id):
+        req = cls.get_by_id(request_id)
+        if not req or req.user_id != user_id:
+            return 'Заявка не найдена', 404
+        if req.status_id != Status.NEW:
+            return 'Удалить можно только заявку в статусе «Новая»', 409
+        cls.db().execute('DELETE FROM request WHERE id = ? AND user_id = ?', (request_id, user_id))
+        return '', 200
+
+    @classmethod
     def summary_for_user(cls, user_id):
         row = cls.db().fetch_one(
             '''SELECT COUNT(*) AS total,
