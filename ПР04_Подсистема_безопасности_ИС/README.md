@@ -2,19 +2,21 @@
 
 **Цель:** обеспечить безопасность портала «Конференции.РФ».
 
+Папка `code/` содержит изменения этой практики, а не самостоятельную сборку. Ниже пути к механизмам указаны относительно [итогового приложения ПР11](../ПР11_Веб-приложение_по_ТЗ/code).
+
 ## Что реализовано
 
 | № | Механизм | Как сделано | Файл |
 |---|---|---|---|
-| 1 | **Хеширование паролей** | `werkzeug.security.generate_password_hash` (scrypt с солью); проверка через `check_password_hash`. Открытый пароль в БД не попадает | `code/backend/models/user.py` |
-| 2 | **Защита от SQL-инъекций** | все запросы только с плейсхолдерами `?` (подготовленные выражения): `db.execute('... WHERE login = ?', (login,))`. Даже фильтры админки собираются из плейсхолдеров | `backend/database.py`, `backend/models/*.py` |
-| 3 | **Разграничение прав** | декораторы: `@participant_required` (участник), `@admin_required` (администратор), `@guest_only` (вход и регистрация только для гостя). Гость видит только главную | `backend/security/decorators.py` |
-| 4 | **Валидация на сервере и клиенте** | сервер: класс `Validator`; клиент: `Rules` в `validation.js` с теми же правилами и выводом ошибок под полем | `validators/validators.py`, `static/js/validation.js` |
-| 5 | **Защита сессий и cookies** | cookie `HttpOnly` (недоступна из JS), `SameSite=Lax`, `Secure` по HTTPS, срок жизни 2 ч; `session.clear()` при входе (защита от фиксации сессии); случайный `SECRET_KEY` | `backend/config.py`, `routes/auth_routes.py` |
-| 6 | **Защита от CSRF** | токен в сессии и в `<meta name="csrf-token">`, обязательный заголовок `X-CSRF-Token` для POST/PATCH; сравнение через `hmac.compare_digest` | `backend/security/protection.py` |
-| 7 | **Защита от подбора пароля** | после 5 неверных попыток вход по логину блокируется на 5 минут (ответ 429) | `LoginThrottle` в `protection.py` |
-| 8 | **Защита от XSS** | Jinja2 экранирует вывод; в JS текст вставляется только через `textContent`; заголовок `Content-Security-Policy` запрещает inline-скрипты | `templates/*`, `static/js/admin.js`, `protection.py` |
-| 9 | **Защитные заголовки** | `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Cache-Control: no-store` для API | `protection.py` |
+| 1 | **Хеширование паролей** | `werkzeug.security.generate_password_hash` (scrypt с солью); проверка через `check_password_hash`. Открытый пароль в БД не попадает | [`backend/models/user.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/models/user.py) |
+| 2 | **Защита от SQL-инъекций** | все запросы только с плейсхолдерами `?` (подготовленные выражения): `db.execute('... WHERE login = ?', (login,))`. Даже фильтры админки собираются из плейсхолдеров | [`backend/database.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/database.py), [`backend/models/`](../ПР11_Веб-приложение_по_ТЗ/code/backend/models) |
+| 3 | **Разграничение прав** | декораторы: `@participant_required` (участник), `@admin_required` (администратор), `@guest_only` (вход и регистрация только для гостя). Гость видит только главную | [`backend/security/decorators.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/decorators.py) |
+| 4 | **Валидация на сервере и клиенте** | сервер: класс `Validator`; клиент: `Rules` в `validation.js` с теми же правилами и выводом ошибок под полем | [`backend/validators/validators.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/validators/validators.py), [`frontend/static/js/validation.js`](../ПР11_Веб-приложение_по_ТЗ/code/frontend/static/js/validation.js) |
+| 5 | **Защита сессий и cookies** | cookie `HttpOnly` (недоступна из JS), `SameSite=Lax`, `Secure` по HTTPS, срок жизни 2 ч; `session.clear()` при входе (защита от фиксации сессии); случайный `SECRET_KEY` | [`backend/config.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/config.py), [`backend/routes/auth_routes.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/routes/auth_routes.py) |
+| 6 | **Защита от CSRF** | токен в сессии и в `<meta name="csrf-token">`, обязательный заголовок `X-CSRF-Token` для POST/PATCH; сравнение через `hmac.compare_digest` | [`backend/security/protection.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/protection.py) |
+| 7 | **Защита от подбора пароля** | после 5 неверных попыток вход по логину блокируется на 5 минут (ответ 429) | [`LoginThrottle`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/protection.py) |
+| 8 | **Защита от XSS** | Jinja2 экранирует вывод; в JS текст вставляется только через `textContent`; заголовок `Content-Security-Policy` запрещает inline-скрипты | [`frontend/templates/`](../ПР11_Веб-приложение_по_ТЗ/code/frontend/templates), [`frontend/static/js/admin.js`](../ПР11_Веб-приложение_по_ТЗ/code/frontend/static/js/admin.js), [`backend/security/protection.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/protection.py) |
+| 9 | **Защитные заголовки** | `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Cache-Control: no-store` для API | [`backend/security/protection.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/protection.py) |
 
 ## Матрица доступа
 
@@ -58,8 +60,8 @@ python -m pytest -q tests
 Папка [`code/`](code). Файлы:
 
 - `backend/security/__init__.py`
-- `backend/security/decorators.py`
-- `backend/security/protection.py`
+- [`backend/security/decorators.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/decorators.py)
+- [`backend/security/protection.py`](../ПР11_Веб-приложение_по_ТЗ/code/backend/security/protection.py)
 - `backend/config.py`
 - `backend/database.py`
 - `backend/models/user.py`

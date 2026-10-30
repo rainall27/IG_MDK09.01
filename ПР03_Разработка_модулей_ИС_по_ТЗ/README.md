@@ -12,7 +12,6 @@ code/
 │   ├── database.py          класс Database (Singleton) - слой работы с БД
 │   ├── models/              ООП-модели: BaseModel → User, Request, Review, Room, Status, PaymentMethod
 │   ├── validators/          класс Validator - серверная валидация
-│   ├── security/            права доступа, CSRF, защита от подбора пароля
 │   └── routes/              маршруты (Blueprint): auth, requests, admin, main
 ├── frontend/                ← ФРОНТЕНД
 │   ├── templates/           HTML-шаблоны Jinja2
@@ -21,6 +20,8 @@ code/
 ├── schema.sql               SQL-скрипт создания таблиц
 └── run.py                   запуск: python run.py
 ```
+
+Это структура снимка ПР03. Подсистема `backend/security/` добавлена в ПР04; итоговая сборка со всеми модулями находится в [ПР11](../ПР11_Веб-приложение_по_ТЗ/code).
 
 ## Реализованные модули
 
