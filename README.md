@@ -26,3 +26,7 @@ python seed_demo.py            # тестовые данные
 python run.py                  # http://127.0.0.1:5000
 ```
 Администратор: **Conf2027 / Demo77** · участник: **ivanov01 / Password1**
+
+## Источник заданий
+
+[Практические работы преподавателя](https://github.com/softboxdev/web_development_course/blob/main/practice_list.md). Состав выбранных работ указан в таблице выше.
